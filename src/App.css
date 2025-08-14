@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+/* App.css */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main {
+  flex: 1 0 auto;
+  width: 100%;
+  padding-top: 60px; /* Add padding equal to navbar height */
+}
+
+/* If your navbar has a different height, adjust this value */
+/* For example, if navbar is 80px tall: */
+/* padding-top: 80px; */

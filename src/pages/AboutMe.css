@@ -1,0 +1,32 @@
+.aboutme-section {
+  background: linear-gradient(135deg, #0d4b85 0%, #08335a 100%);
+  padding: 60px 0;
+}
+
+.aboutme-box {
+  background: white;
+  padding: 25px 30px;
+  border-radius: 15px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+}
+
+.aboutme-img {
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+  border: 5px solid white;
+}
+
+.carousel-indicators [data-bs-target] {
+  background-color: white;
+}
+
+.custom-arrow {
+  filter: invert(1);
+}
+
+@media (max-width: 992px) {
+  .aboutme-box {
+    text-align: center;
+  }
+}
