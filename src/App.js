@@ -14,7 +14,7 @@ import './App.css';
 
 function App() {
   return (
-    <Router basename="/personal_portfolio">
+    <Router>
       <LanguageProvider>
         <div className="app">
           <Navbar />
