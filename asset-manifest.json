@@ -1,0 +1,42 @@
+{
+  "files": {
+    "main.css": "/personal_portfolio/static/css/main.2a0fd95c.css",
+    "main.js": "/personal_portfolio/static/js/main.ba527d95.js",
+    "static/js/453.5d79306b.chunk.js": "/personal_portfolio/static/js/453.5d79306b.chunk.js",
+    "static/media/fotob.png": "/personal_portfolio/static/media/fotob.02056413bc98e45d9d95.png",
+    "static/media/foto10.png": "/personal_portfolio/static/media/foto10.e931b6c5aaad132de594.png",
+    "static/media/foto31.png": "/personal_portfolio/static/media/foto31.007cd3d2d6c2ec471b8d.png",
+    "static/media/foto37.png": "/personal_portfolio/static/media/foto37.33f34c99c97a6badc1f0.png",
+    "static/media/foto30.png": "/personal_portfolio/static/media/foto30.37c0d4335d135c0a845c.png",
+    "static/media/fotohrms1.png": "/personal_portfolio/static/media/fotohrms1.4833be7ae45b1adb45aa.png",
+    "static/media/foto100.png": "/personal_portfolio/static/media/foto100.854173fef794a53f63c1.png",
+    "static/media/image.png": "/personal_portfolio/static/media/image.89d38fe41358a4023ca2.png",
+    "static/media/vetura3.png": "/personal_portfolio/static/media/vetura3.de95ab87ee43459df2ce.png",
+    "static/media/foto1.png": "/personal_portfolio/static/media/foto1.78f23d341e975f73141b.png",
+    "static/media/fotohrms2.png": "/personal_portfolio/static/media/fotohrms2.dfad104d430c3ddf1e66.png",
+    "static/media/fotohrms3.png": "/personal_portfolio/static/media/fotohrms3.15b68735c81ed754748f.png",
+    "static/media/foto52.png": "/personal_portfolio/static/media/foto52.575e086f4f5a9b26a184.png",
+    "static/media/fotohrms5.png": "/personal_portfolio/static/media/fotohrms5.afba6c8d3287996ccb67.png",
+    "static/media/fotohrms6.png": "/personal_portfolio/static/media/fotohrms6.69a9eff5db9888900cc4.png",
+    "static/media/vetura1.png": "/personal_portfolio/static/media/vetura1.62ef86902aef4eff7348.png",
+    "static/media/vetura2.png": "/personal_portfolio/static/media/vetura2.f4e88a65f41af0298f6f.png",
+    "static/media/carsales1.png": "/personal_portfolio/static/media/carsales1.df350dd525ae492c8c95.png",
+    "static/media/Android.png": "/personal_portfolio/static/media/Android.a9649029568acf750cf4.png",
+    "static/media/barnatore3.png": "/personal_portfolio/static/media/barnatore3.b459ac35e05f0fc84b10.png",
+    "static/media/foto53.png": "/personal_portfolio/static/media/foto53.712dfc6b3f42723db7b2.png",
+    "static/media/foto40.png": "/personal_portfolio/static/media/foto40.356d179d30d8958da858.png",
+    "static/media/foto36.png": "/personal_portfolio/static/media/foto36.468f782b5b41eb9f5ab1.png",
+    "static/media/foto12.png": "/personal_portfolio/static/media/foto12.97b6869d6125986a5f5e.png",
+    "static/media/android1.png": "/personal_portfolio/static/media/android1.6822be97fd502d2d78c9.png",
+    "static/media/android3.png": "/personal_portfolio/static/media/android3.82bff08d4dff0e3257e4.png",
+    "static/media/java.png": "/personal_portfolio/static/media/java.4d1300013f8bb35f85a4.png",
+    "index.html": "/personal_portfolio/index.html",
+    "main.2a0fd95c.css.map": "/personal_portfolio/static/css/main.2a0fd95c.css.map",
+    "main.ba527d95.js.map": "/personal_portfolio/static/js/main.ba527d95.js.map",
+    "453.5d79306b.chunk.js.map": "/personal_portfolio/static/js/453.5d79306b.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.2a0fd95c.css",
+    "static/js/main.ba527d95.js"
+  ]
+}
