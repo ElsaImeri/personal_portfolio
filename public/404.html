@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Redirecting...</title>
+  <script>
+    // Check if this is GitHub Pages and handle redirect properly
+    if (window.location.hostname.includes('github.io')) {
+      // Get the requested path
+      const path = window.location.pathname;
+      
+      // If a specific page is requested, redirect to main page with hash
+      if (path && path !== '/' && !path.includes('index.html')) {
+        // Remove repository name from path (e.g. '/personal_portfolio/')
+        const repoName = path.split('/')[1] || '';
+        const targetSection = path.split('/').pop();
+        
+        // Redirect to main page with hash
+        window.location.href = `/${repoName}/#${targetSection}`;
+      } else {
+        // If it's just a 404, redirect to home page
+        window.location.href = '/';
+      }
+    } else {
+      // For local deployment or other servers
+      const hash = window.location.hash;
+      if (hash) {
+        // If hash exists, redirect directly to the section
+        const element = document.getElementById(hash.substring(1));
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      } else {
+        // If no hash, redirect to home page
+        window.location.href = '/';
+      }
+    }
+  </script>
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=/">
+  </noscript>
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background-color: #f8f9fa;
+      color: #1e293b;
+    }
+    .redirect-message {
+      text-align: center;
+      padding: 2rem;
+      border-radius: 0.5rem;
+      background-color: white;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .spinner {
+      border: 4px solid rgba(79, 70, 229, 0.2);
+      border-radius: 50%;
+      border-top: 4px solid #4f46e5;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="redirect-message">
+    <div class="spinner"></div>
+    <h2>Redirecting you...</h2>
+    <p>If redirection doesn't happen automatically, please <a href="/">click here</a>.</p>
+  </div>
+</body>
+</html>

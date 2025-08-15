@@ -2,42 +2,76 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="Web site created using create-react-app"
-    />
-    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
-    <!--
-      manifest.json provides metadata used when your web app is installed on a
-      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
-    -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="theme-color" content="#4f46e5" />
+    <meta name="description" content="Professional portfolio of Elsa Imeri, Software Developer showcasing projects, skills and experience" />
+    <meta name="keywords" content="software developer, portfolio, web developer, Elsa Imeri, programming, projects" />
+    <meta property="og:title" content="Elsa Imeri | Software Developer Portfolio" />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://elsaimeri.github.io" />
+    <meta property="og:image" content="%PUBLIC_URL%/preview.jpg" />
+    <meta property="og:description" content="Professional portfolio of Elsa Imeri, Software Developer" />
+    
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <!--
-      Notice the use of %PUBLIC_URL% in the tags above.
-      It will be replaced with the URL of the `public` folder during the build.
-      Only files inside the `public` folder can be referenced from the HTML.
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    
+    <!-- Preconnect to important origins -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <title>Elsa Imeri | Software Developer Portfolio</title>
 
-      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
-      work correctly both with client-side routing and a non-root public URL.
-      Learn how to configure a non-root public URL by running `npm run build`.
-    -->
-    <title>React App</title>
+    <!-- Critical CSS moved before any scripts -->
+    <style>
+      /* Critical CSS to prevent layout shift */
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+          'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+          sans-serif;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      #root {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+    </style>
   </head>
   <body>
-    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <noscript>
+      <div style="text-align: center; padding: 2rem; font-family: 'Inter', sans-serif;">
+        <h2>JavaScript is required to view this portfolio</h2>
+        <p>Please enable JavaScript in your browser settings to continue.</p>
+        <p>Alternatively, you can view my LinkedIn profile at 
+          <a href="https://www.linkedin.com/in/elsa-imeri-953b7b323" target="_blank" rel="noopener noreferrer">
+            linkedin.com/in/elsa-imeri
+          </a>
+        </p>
+      </div>
+    </noscript>
     <div id="root"></div>
-    <!--
-      This HTML file is a template.
-      If you open it directly in the browser, you will see an empty page.
 
-      You can add webfonts, meta tags, or analytics to this file.
-      The build step will place the bundled scripts into the <body> tag.
+    <!-- Load non-critical CSS asynchronously -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'" />
+    
+    <!-- Fallback for browsers that don't support media="print" -->
+    <noscript>
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" />
+    </noscript>
 
-      To begin the development, run `npm start` or `yarn start`.
-      To create a production bundle, use `npm run build` or `yarn build`.
-    -->
+    <!-- Main script should be loaded after the root element exists -->
+    <script>
+      // Ensure DOM is fully loaded before React initializes
+      document.addEventListener('DOMContentLoaded', function() {
+        // This ensures the root element exists before React tries to use it
+        if (!document.getElementById('root')) {
+          console.error('Root element not found!');
+          return;
+        }
+      });
+    </script>
   </body>
 </html>
