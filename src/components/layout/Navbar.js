@@ -1,128 +1,134 @@
 import React, { useState, useEffect, useCallback, useContext, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
-  FaCode, FaBookOpen, FaGithub, FaGlobe, FaHome, 
-  FaBars, FaTimes, FaChevronDown, FaRoute, 
-  FaProjectDiagram, FaEnvelope, FaLinkedin, FaFilePdf 
+  FaCode, FaProjectDiagram, FaRoute, FaEnvelope, 
+  FaBars, FaTimes, FaChevronDown, FaGlobe,
+  FaHome, FaGithub, FaLinkedin, FaSun, FaMoon,
+  FaUser, FaBriefcase, FaHistory, FaPaperPlane,
+  FaFileAlt, FaBullseye
 } from 'react-icons/fa';
 import { SiUpwork, SiFiverr } from 'react-icons/si';
 import { Link, useLocation } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { LanguageContext } from '../../contexts/LanguageContext';
 import { translations } from '../../utils/translations';
+import ThemeContext from '../../contexts/ThemeContext';
 
-// Light color scheme configuration
-const colors = {
-  primary: '#4f46e5',
-  secondary: '#64748b',
-  dark: '#ffffff',
-  light: '#1e293b',
-  accent: '#0ea5e9',
-  border: 'rgba(30, 41, 59, 0.1)'
+// Color schemes for light and dark modes - UPDATED
+const colorSchemes = {
+  dark: {
+    primary: '#6c63ff',
+    secondary: '#8a85ff',
+    accent: '#ff6b6b',
+    text: '#f5f5f5',
+    textSecondary: '#a0a0a0',
+    background: 'rgba(15, 17, 26, 0.98)',
+    backgroundSolid: '#0f111a',
+    border: 'rgba(108, 99, 255, 0.25)',
+    menuBackground: 'rgba(15, 17, 26, 0.99)',
+    icon: '#6c63ff',
+    overlay: 'rgba(0, 0, 0, 0.7)',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    cardBackground: 'rgba(255, 255, 255, 0.05)'
+  },
+  light: {
+    primary: '#6c63ff',
+    secondary: '#8a85ff',
+    accent: '#ff6b6b',
+    text: '#2d3748',
+    textSecondary: '#718096',
+    background: 'rgba(255, 255, 255, 0.98)',
+    backgroundSolid: '#ffffff',
+    border: 'rgba(108, 99, 255, 0.3)',
+    menuBackground: 'rgba(255, 255, 255, 0.99)',
+    icon: '#6c63ff',
+    overlay: 'rgba(0, 0, 0, 0.3)',
+    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    cardBackground: 'rgba(0, 0, 0, 0.03)'
+  }
 };
 
-// Komponentët e vegjël të memoizuar
-const NavIconItem = React.memo(({ icon, text, link, colors, onClick }) => (
+// Komponentët e vegjël të memoizuar - UPDATED DESIGN
+const NavIconItem = React.memo(({ icon, text, link, onClick, isActive, colorScheme }) => (
   <motion.a
     href={link}
     onClick={(e) => onClick(e, link)}
-    className="d-flex align-items-center text-decoration-none"
+    className="d-flex align-items-center text-decoration-none position-relative"
     style={{
-      color: colors.light,
+      color: isActive ? colorScheme.primary : colorScheme.text,
       fontFamily: "'Inter', sans-serif",
-      fontSize: '0.95rem',
-      fontWeight: 500,
-      marginLeft: '2.5rem',
-      padding: '0.7rem 1.2rem',
-      border: `1px solid ${colors.border}`,
-      borderRadius: '10px',
-      backgroundColor: 'rgba(30, 41, 59, 0.03)',
-      transition: 'all 0.2s ease',
+      fontSize: '0.92rem',
+      fontWeight: isActive ? 600 : 500,
+      margin: '0 0.8rem',
+      padding: '0.6rem 1.2rem',
+      borderRadius: '12px',
+      backgroundColor: isActive ? `${colorScheme.primary}15` : 'transparent',
+      transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+      border: '1px solid transparent',
     }}
     whileHover={{ 
       y: -2,
-      backgroundColor: 'rgba(79, 70, 229, 0.08)',
-      boxShadow: '0 4px 6px rgba(0, 0, 0, 0.03)'
+      backgroundColor: `${colorScheme.primary}10`,
+      borderColor: `${colorScheme.primary}30`,
+      boxShadow: `0 4px 15px ${colorScheme.primary}08`
     }}
+    whileTap={{ scale: 0.98 }}
     aria-label={text}
   >
     <span style={{ 
-      fontSize: '1.1rem', 
-      marginRight: '0.6rem', 
-      color: colors.primary,
-      transition: 'color 0.2s ease'
+      fontSize: '1rem', 
+      marginRight: '0.5rem', 
+      color: isActive ? colorScheme.primary : colorScheme.textSecondary,
+      transition: 'color 0.3s ease'
     }}>
       {icon}
     </span>
     {text}
+    {isActive && (
+      <motion.div
+        style={{
+          position: 'absolute',
+          bottom: '-2px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '20px',
+          height: '2px',
+          backgroundColor: colorScheme.primary,
+          borderRadius: '2px'
+        }}
+        layoutId="activeIndicator"
+        transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+      />
+    )}
   </motion.a>
 ));
 
-const NavTextItem = React.memo(({ text, link, colors, isActive = false, onClick }) => (
-  <motion.a
-    href={link}
-    onClick={(e) => onClick(e, link)}
-    className="text-decoration-none"
+const ThemeToggle = React.memo(({ isDarkMode, toggleTheme, isMobile = false }) => (
+  <motion.button
+    className="theme-toggle-button"
+    onClick={toggleTheme}
     style={{
-      color: isActive ? colors.light : colors.secondary,
-      fontWeight: isActive ? 600 : 500,
-      fontSize: '0.95rem',
-      fontFamily: "'Inter', sans-serif",
-      marginLeft: '2.5rem',
-      padding: '0.7rem 1.2rem',
-      borderRadius: '10px',
-      backgroundColor: isActive ? 'rgba(79, 70, 229, 0.08)' : 'transparent',
-      border: isActive ? `1px solid ${colors.primary}` : 'none',
-      transition: 'all 0.2s ease'
-    }}
-    whileHover={{ 
-      y: -2,
-      backgroundColor: 'rgba(79, 70, 229, 0.05)'
-    }}
-    aria-label={text}
-  >
-    {text}
-  </motion.a>
-));
-
-const MobileNavItem = React.memo(({ icon, text, link, colors, onClick }) => (
-  <motion.a
-    href={link}
-    onClick={(e) => {
-      e.preventDefault();
-      onClick(e, link);
-    }}
-    className="text-decoration-none"
-    initial={{ x: 20, opacity: 0 }}
-    animate={{ x: 0, opacity: 1 }}
-    transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-    whileHover={{ x: 5 }}
-    whileTap={{ scale: 0.98 }}
-    style={{
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: `1px solid ${isDarkMode ? colorSchemes.dark.border : colorSchemes.light.border}`,
+      color: isDarkMode ? colorSchemes.dark.text : colorSchemes.light.text,
+      fontSize: isMobile ? '0.9rem' : '1rem',
+      cursor: 'pointer',
+      padding: isMobile ? '0.5rem' : '0.6rem',
+      borderRadius: '12px',
+      transition: 'all 0.3s ease',
+      backdropFilter: 'blur(10px)',
       display: 'flex',
       alignItems: 'center',
-      padding: '1rem 1.5rem',
-      borderRadius: '10px',
-      color: colors.light,
-      fontFamily: "'Inter', sans-serif",
-      fontSize: '1.05rem',
-      backgroundColor: 'rgba(30, 41, 59, 0.03)',
-      border: `1px solid ${colors.border}`,
-      marginBottom: '0.5rem',
-      transition: 'all 0.2s ease'
+      justifyContent: 'center',
+      width: isMobile ? '40px' : '44px',
+      height: isMobile ? '40px' : '44px'
     }}
-    aria-label={text}
+    whileHover={{ scale: 1.05, backgroundColor: 'rgba(255, 255, 255, 0.15)' }}
+    whileTap={{ scale: 0.95 }}
+    aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
   >
-    <span style={{ 
-      marginRight: '1.2rem',
-      fontSize: '1.1rem',
-      color: colors.primary,
-      transition: 'color 0.2s ease'
-    }}>
-      {icon}
-    </span>
-    {text}
-  </motion.a>
+    {isDarkMode ? <FaSun /> : <FaMoon />}
+  </motion.button>
 ));
 
 const LanguageSelector = React.memo(({ 
@@ -130,36 +136,40 @@ const LanguageSelector = React.memo(({
   setIsLanguageOpen, 
   selectedLanguage, 
   handleLanguageSelect, 
-  colors, 
-  languages, 
-  isMobile = false 
+  isMobile = false,
+  colorScheme
 }) => {
+  const { languages } = useContext(LanguageContext);
+  
   return (
     <div className="position-relative" style={{ zIndex: 1051 }}>
-      <button
+      <motion.button
         className="language-selector-button"
         onClick={() => setIsLanguageOpen(!isLanguageOpen)}
         style={{
           fontFamily: "'Inter', sans-serif",
           fontSize: isMobile ? '0.85rem' : '0.9rem',
-          color: colors.light,
-          backgroundColor: 'rgba(30, 41, 59, 0.05)',
-          border: `1px solid ${colors.border}`,
-          borderRadius: '8px',
-          padding: isMobile ? '0.5rem 0.8rem' : '0.6rem 1rem',
+          color: colorScheme.text,
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          border: `1px solid ${colorScheme.border}`,
+          borderRadius: '12px',
+          padding: isMobile ? '0.5rem 0.8rem' : '0.7rem 1rem',
           gap: '0.5rem',
           display: 'flex',
           alignItems: 'center',
           cursor: 'pointer',
-          minWidth: isMobile ? 'auto' : '110px',
+          minWidth: isMobile ? 'auto' : '120px',
           justifyContent: 'center',
-          transition: 'all 0.2s ease'
+          transition: 'all 0.3s ease',
+          backdropFilter: 'blur(10px)'
         }}
+        whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}
+        whileTap={{ scale: 0.98 }}
         aria-expanded={isLanguageOpen}
         aria-haspopup="true"
       >
         <FaGlobe style={{ 
-          color: colors.primary, 
+          color: colorScheme.primary, 
           fontSize: isMobile ? '0.9rem' : '1rem',
           marginRight: isMobile ? '0' : '0.4rem'
         }} />
@@ -168,75 +178,76 @@ const LanguageSelector = React.memo(({
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             whiteSpace: 'nowrap',
-            maxWidth: '90px'
+            maxWidth: '80px'
           }}>
             {selectedLanguage}
           </span>
         )}
-        <FaChevronDown style={{ 
-          fontSize: '0.7rem', 
-          marginLeft: isMobile ? '0.3rem' : '0.5rem',
-          transition: 'transform 0.2s ease',
-          transform: isLanguageOpen ? 'rotate(180deg)' : 'rotate(0deg)'
-        }} />
-      </button>
+        <motion.span
+          animate={{ rotate: isLanguageOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+        >
+          <FaChevronDown style={{ fontSize: '0.7rem' }} />
+        </motion.span>
+      </motion.button>
 
       <AnimatePresence>
         {isLanguageOpen && (
           <motion.div
             className="language-selector-menu"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.15 }}
+            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+            transition={{ duration: 0.2 }}
             style={{
               position: 'absolute',
               top: '100%',
               right: 0,
-              backgroundColor: colors.dark,
-              border: `1px solid ${colors.border}`,
-              borderRadius: '8px',
+              backgroundColor: colorScheme.menuBackground,
+              border: `1px solid ${colorScheme.border}`,
+              borderRadius: '12px',
               padding: '0.5rem 0',
               marginTop: '0.5rem',
               minWidth: '140px',
-              boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)',
+              boxShadow: `0 20px 40px rgba(0, 0, 0, 0.15)`,
               zIndex: 1052,
-              overflow: 'hidden'
+              overflow: 'hidden',
+              backdropFilter: 'blur(20px)'
             }}
             role="menu"
           >
             {languages.map((lang) => (
-              <div
+              <motion.div
                 key={lang.code}
                 onClick={() => {
                   handleLanguageSelect(lang.name);
                   setIsLanguageOpen(false);
                 }}
+                whileHover={{ backgroundColor: `${colorScheme.primary}10` }}
+                whileTap={{ scale: 0.98 }}
                 style={{
-                  padding: '0.7rem 1.2rem',
+                  padding: '0.8rem 1.2rem',
                   cursor: 'pointer',
-                  color: selectedLanguage === lang.name ? colors.primary : colors.light,
-                  backgroundColor: selectedLanguage === lang.name ? 'rgba(79, 70, 229, 0.08)' : 'transparent',
+                  color: selectedLanguage === lang.name ? colorScheme.primary : colorScheme.text,
+                  backgroundColor: selectedLanguage === lang.name ? `${colorScheme.primary}15` : 'transparent',
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '0.9rem',
-                  transition: 'all 0.15s ease',
+                  transition: 'all 0.2s ease',
                   display: 'flex',
                   alignItems: 'center',
                   gap: '0.7rem'
                 }}
-                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(30, 41, 59, 0.05)'}
-                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = selectedLanguage === lang.name ? 'rgba(79, 70, 229, 0.08)' : 'transparent'}
                 role="menuitem"
               >
                 <span style={{ 
                   width: '6px', 
                   height: '6px', 
                   borderRadius: '50%',
-                  backgroundColor: selectedLanguage === lang.name ? colors.primary : colors.secondary,
-                  transition: 'background-color 0.2s ease'
+                  backgroundColor: selectedLanguage === lang.name ? colorScheme.primary : colorScheme.textSecondary,
+                  transition: 'all 0.2s ease'
                 }} />
                 {lang.name}
-              </div>
+              </motion.div>
             ))}
           </motion.div>
         )}
@@ -245,28 +256,119 @@ const LanguageSelector = React.memo(({
   );
 });
 
-const MobileMenuToggle = React.memo(({ isMobileMenuOpen, setIsMobileMenuOpen, colors }) => (
+const MobileMenuToggle = React.memo(({ isMobileMenuOpen, setIsMobileMenuOpen, colorScheme }) => (
   <motion.button
     className="mobile-menu-toggle"
     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
     style={{
-      background: 'transparent',
-      border: 'none',
-      color: colors.light,
-      fontSize: '1.5rem',
+      background: 'rgba(255, 255, 255, 0.1)',
+      border: `1px solid ${colorScheme.border}`,
+      color: colorScheme.text,
+      fontSize: '1.1rem',
       cursor: 'pointer',
       zIndex: 1051,
-      padding: '0.3rem',
-      borderRadius: '6px',
-      transition: 'all 0.2s ease'
+      padding: '0.7rem',
+      borderRadius: '12px',
+      transition: 'all 0.3s ease',
+      backdropFilter: 'blur(10px)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '44px',
+      height: '44px'
     }}
-    whileHover={{ backgroundColor: 'rgba(30, 41, 59, 0.05)' }}
-    whileTap={{ scale: 0.9 }}
+    whileHover={{ backgroundColor: 'rgba(255, 255, 255, 0.15)' }}
+    whileTap={{ scale: 0.95 }}
     aria-expanded={isMobileMenuOpen}
     aria-label="Toggle menu"
   >
-    {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+    <AnimatePresence mode="wait">
+      <motion.span
+        key={isMobileMenuOpen ? 'close' : 'menu'}
+        initial={{ rotate: -90, opacity: 0 }}
+        animate={{ rotate: 0, opacity: 1 }}
+        exit={{ rotate: 90, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+      >
+        {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+      </motion.span>
+    </AnimatePresence>
   </motion.button>
+));
+
+const MobileNavItem = React.memo(({ icon, text, link, onClick, isActive, colorScheme, index }) => (
+  <motion.div
+    initial={{ y: 20, opacity: 0 }}
+    animate={{ y: 0, opacity: 1 }}
+    transition={{ delay: 0.1 + index * 0.05, duration: 0.3 }}
+  >
+    <motion.a
+      href={link}
+      onClick={(e) => {
+        e.preventDefault();
+        onClick(e, link);
+      }}
+      className="text-decoration-none d-block"
+      whileHover={{ x: 5 }}
+      whileTap={{ scale: 0.98 }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        padding: '1rem 1.2rem',
+        borderRadius: '14px',
+        color: isActive ? colorScheme.primary : colorScheme.text,
+        fontFamily: "'Inter', sans-serif",
+        fontSize: '1rem',
+        fontWeight: 500,
+        backgroundColor: isActive ? `${colorScheme.primary}15` : colorScheme.cardBackground,
+        border: isActive ? `2px solid ${colorScheme.primary}` : `1px solid ${colorScheme.border}`,
+        marginBottom: '0.5rem',
+        transition: 'all 0.3s ease',
+        position: 'relative',
+        overflow: 'hidden'
+      }}
+      aria-label={text}
+    >
+      <div style={{
+        position: 'absolute',
+        left: 0,
+        top: 0,
+        bottom: 0,
+        width: '4px',
+        backgroundColor: isActive ? colorScheme.primary : 'transparent',
+        transition: 'background-color 0.3s ease'
+      }} />
+      
+      <span style={{ 
+        marginRight: '1rem',
+        fontSize: '1.2rem',
+        color: isActive ? colorScheme.primary : colorScheme.textSecondary,
+        transition: 'color 0.3s ease',
+        minWidth: '24px',
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
+        {icon}
+      </span>
+      
+      <span style={{ flex: 1 }}>{text}</span>
+      
+      {isActive && (
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+          style={{
+            width: '8px',
+            height: '8px',
+            borderRadius: '50%',
+            backgroundColor: colorScheme.primary,
+            marginLeft: '0.5rem'
+          }}
+        />
+      )}
+    </motion.a>
+  </motion.div>
 ));
 
 const MobileMenu = React.memo(({ 
@@ -274,124 +376,128 @@ const MobileMenu = React.memo(({
   isMobileMenuOpen, 
   setIsMobileMenuOpen,
   handleNavigation, 
-  colors, 
   translations, 
-  languages, 
   selectedLanguage, 
-  handleLanguageSelect 
+  handleLanguageSelect,
+  activeSection,
+  isDarkMode,
+  toggleTheme,
+  colorScheme
 }) => {
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+
+  const navItems = [
+    { icon: <FaUser />, text: translations.skills, link: '#skills', id: 'skills' },
+    { icon: <FaBriefcase />, text: translations.projects, link: '#projects', id: 'projects' },
+    { icon: <FaHistory />, text: translations.journey, link: '#experience', id: 'experience' },
+    { icon: <FaFileAlt />, text: translations.resume, link: '#resume', id: 'resume' },
+    { icon: <FaBullseye />, text: translations.goals, link: '#goals', id: 'goals' },
+    { icon: <FaPaperPlane />, text: translations.contact, link: '#contact', id: 'contact' }
+  ];
+
+  const socialLinks = [
+    { icon: <SiUpwork />, label: "Upwork" },
+    { icon: <SiFiverr />, label: "Fiverr" },
+    { icon: <FaGithub />, label: "GitHub", href: "https://github.com/elsaimeri" },
+    { icon: <FaLinkedin />, label: "LinkedIn", href: "https://www.linkedin.com/in/elsa-imeri-953b7b323" }
+  ];
 
   return (
     <AnimatePresence>
       {isMobile && isMobileMenuOpen && (
         <>
+          {/* Overlay */}
           <motion.div
             key="mobile-menu-overlay"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.3 }}
             style={{
               position: 'fixed',
               top: 0,
               left: 0,
               right: 0,
               bottom: 0,
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              backgroundColor: colorScheme.overlay,
               zIndex: 1040,
               backdropFilter: 'blur(4px)',
             }}
             onClick={() => setIsMobileMenuOpen(false)}
           />
 
+          {/* Mobile Menu Content - Now slides down from top */}
           <motion.div
             key="mobile-menu-content"
             className="mobile-menu-container"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
+            initial={{ y: '-100%', opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: '-100%', opacity: 0 }}
             transition={{ 
               type: 'spring',
-              damping: 25,
-              stiffness: 300
+              damping: 30,
+              stiffness: 300,
+              mass: 0.8
             }}
             style={{
               position: 'fixed',
               top: 0,
+              left: 0,
               right: 0,
-              bottom: 0,
-              width: '85%',
-              maxWidth: '340px',
-              backgroundColor: colors.dark,
+              height: '100vh',
+              backgroundColor: colorScheme.menuBackground,
               zIndex: 1045,
-              padding: '3rem 1.8rem',
+              padding: '5rem 1.5rem 2rem',
               overflowY: 'auto',
-              boxShadow: '-8px 0 30px rgba(0, 0, 0, 0.1)',
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              borderBottom: `1px solid ${colorScheme.border}`,
+              boxShadow: '0 20px 40px rgba(0, 0, 0, 0.3)'
             }}
           >
-            <div className="mb-6" style={{ marginTop: '40px' }}>
-              <h3 style={{
-                fontFamily: "'Inter', sans-serif",
-                fontWeight: 700,
-                color: colors.light,
-                fontSize: '1.5rem',
-                marginBottom: '0.3rem'
-              }}>
-                Elsa Imeri
-              </h3>
+            {/* Header Section */}
+            <motion.div
+              className="text-center mb-6"
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+            >
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                className="d-inline-block"
+              >
+                <h2 style={{
+                  fontFamily: "'Inter', sans-serif",
+                  fontWeight: 700,
+                  color: colorScheme.text,
+                  fontSize: '1.8rem',
+                  marginBottom: '0.5rem',
+                  background: colorScheme.gradient,
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text'
+                }}>
+                  Elsa Imeri
+                </h2>
+              </motion.div>
+              
               <p style={{
                 fontFamily: "'Inter', sans-serif",
-                color: colors.primary,
-                fontSize: '0.95rem',
-                marginBottom: '0.5rem'
+                color: colorScheme.primary,
+                fontSize: '1rem',
+                fontWeight: 500,
+                marginBottom: '2rem'
               }}>
                 {translations.fullstack}
               </p>
-            </div>
 
-            <div className="d-flex flex-column gap-3" style={{ flex: 1 }}>
-              <MobileNavItem
-                icon={<FaCode />}
-                text={translations.skills}
-                link="#skills"
-                colors={colors}
-                onClick={handleNavigation}
-              />
-              <MobileNavItem
-                icon={<FaProjectDiagram />}
-                text={translations.projects}
-                link="#projects"
-                colors={colors}
-                onClick={handleNavigation}
-              />
-              <MobileNavItem
-                icon={<FaRoute />}
-                text={translations.journey}
-                link="#experience"
-                colors={colors}
-                onClick={handleNavigation}
-              />
-              <MobileNavItem
-                icon={<FaEnvelope />}
-                text={translations.contact}
-                link="#contact"
-                colors={colors}
-                onClick={handleNavigation}
-              />
-              <MobileNavItem
-                icon={<FaGithub />}
-                text={translations.goals}
-                link="#goals"
-                colors={colors}
-                onClick={handleNavigation}
-              />
-            </div>
-
-            <div className="mt-auto pt-6">
-              <div className="mb-5">
+              {/* Controls */}
+              <motion.div 
+                className="d-flex justify-content-center gap-3 mb-4"
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.15 }}
+              >
                 <LanguageSelector
                   isLanguageOpen={isLanguageOpen}
                   setIsLanguageOpen={setIsLanguageOpen}
@@ -400,124 +506,117 @@ const MobileMenu = React.memo(({
                     handleLanguageSelect(lang);
                     setIsLanguageOpen(false);
                   }}
-                  colors={colors}
-                  languages={languages}
-                  isMobile={false}
+                  isMobile={true}
+                  colorScheme={colorScheme}
                 />
-              </div>
+                <ThemeToggle 
+                  isDarkMode={isDarkMode} 
+                  toggleTheme={toggleTheme} 
+                  isMobile={true}
+                />
+              </motion.div>
+            </motion.div>
 
+            {/* Navigation Items */}
+            <motion.div 
+              className="flex-grow-1"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2 }}
+            >
+              {navItems.map((item, index) => (
+                <MobileNavItem
+                  key={item.id}
+                  icon={item.icon}
+                  text={item.text}
+                  link={item.link}
+                  onClick={handleNavigation}
+                  isActive={activeSection === item.id}
+                  colorScheme={colorScheme}
+                  index={index}
+                />
+              ))}
+            </motion.div>
+
+            {/* Footer Section */}
+            <motion.div 
+              className="mt-auto pt-4"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+            >
               <p style={{
                 fontFamily: "'Inter', sans-serif",
-                color: colors.secondary,
-                fontSize: '0.85rem',
+                color: colorScheme.textSecondary,
+                fontSize: '0.9rem',
                 marginBottom: '1.5rem',
-                textAlign: 'center'
+                textAlign: 'center',
+                fontWeight: 500
               }}>
                 {translations.available}
               </p>
 
-              <div className="d-flex gap-4 justify-content-center">
-                <motion.a
-                  href="#contact"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavigation(e, "#contact");
-                  }}
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    color: colors.light,
-                    fontSize: '1.4rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(30, 41, 59, 0.05)',
-                    border: `1px solid ${colors.border}`,
-                    transition: 'all 0.2s ease'
-                  }}
-                  aria-label="Contact section"
-                >
-                  <SiUpwork />
-                </motion.a>
+              {/* Social Links */}
+              <motion.div 
+                className="d-flex justify-content-center gap-3"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.35 }}
+              >
+                {socialLinks.map((item, index) => (
+                  <motion.a
+                    key={item.label}
+                    href={item.href || "#contact"}
+                    onClick={!item.href ? (e) => {
+                      e.preventDefault();
+                      handleNavigation(e, "#contact");
+                    } : undefined}
+                    target={item.href ? "_blank" : undefined}
+                    rel={item.href ? "noopener noreferrer" : undefined}
+                    whileHover={{ y: -3, scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 + index * 0.05 }}
+                    style={{
+                      color: colorScheme.text,
+                      fontSize: '1.3rem',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      width: '50px',
+                      height: '50px',
+                      borderRadius: '14px',
+                      backgroundColor: colorScheme.cardBackground,
+                      border: `1px solid ${colorScheme.border}`,
+                      transition: 'all 0.3s ease',
+                      backdropFilter: 'blur(10px)',
+                      textDecoration: 'none'
+                    }}
+                    aria-label={item.label}
+                  >
+                    {item.icon}
+                  </motion.a>
+                ))}
+              </motion.div>
 
-                <motion.a
-                  href="#contact"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    handleNavigation(e, "#contact");
-                  }}
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    color: colors.light,
-                    fontSize: '1.4rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(30, 41, 59, 0.05)',
-                    border: `1px solid ${colors.border}`,
-                    transition: 'all 0.2s ease'
-                  }}
-                  aria-label="Fiverr profile"
-                >
-                  <SiFiverr />
-                </motion.a>
-
-                <motion.a
-                  href="https://github.com/elsaimeri"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    color: colors.light,
-                    fontSize: '1.4rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(30, 41, 59, 0.05)',
-                    border: `1px solid ${colors.border}`,
-                    transition: 'all 0.2s ease'
-                  }}
-                  aria-label="GitHub profile"
-                >
-                  <FaGithub />
-                </motion.a>
-
-                <motion.a
-                  href="https://www.linkedin.com/in/elsa-imeri-953b7b323"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  whileHover={{ y: -3 }}
-                  whileTap={{ scale: 0.95 }}
-                  style={{
-                    color: colors.light,
-                    fontSize: '1.4rem',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    width: '44px',
-                    height: '44px',
-                    borderRadius: '12px',
-                    backgroundColor: 'rgba(30, 41, 59, 0.05)',
-                    border: `1px solid ${colors.border}`,
-                    transition: 'all 0.2s ease'
-                  }}
-                  aria-label="LinkedIn profile"
-                >
-                  <FaLinkedin />
-                </motion.a>
-              </div>
-            </div>
+              {/* Close Hint */}
+              <motion.div
+                className="text-center mt-4"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5 }}
+              >
+                <span style={{
+                  fontFamily: "'Inter', sans-serif",
+                  color: colorScheme.textSecondary,
+                  fontSize: '0.8rem',
+                  fontWeight: 500
+                }}>
+                  Tap anywhere outside to close
+                </span>
+              </motion.div>
+            </motion.div>
           </motion.div>
         </>
       )}
@@ -525,21 +624,43 @@ const MobileMenu = React.memo(({
   );
 });
 
-const ProfessionalWhiteNavbar = () => {
-  const { language, languageCode, changeLanguage, languages } = useContext(LanguageContext);
+const ModernNavbar = () => {
+  const { language, languageCode, changeLanguage } = useContext(LanguageContext);
+  const { isDarkMode, toggleTheme } = useContext(ThemeContext);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 992);
   const [isLanguageOpen, setIsLanguageOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('home');
   const location = useLocation();
 
   const isMobile = windowWidth < 992;
   const t = useMemo(() => translations[languageCode]?.navbar || translations.en.navbar, [languageCode]);
+  const colorScheme = useMemo(() => isDarkMode ? colorSchemes.dark : colorSchemes.light, [isDarkMode]);
 
+  // Debounced scroll handler
   const handleScroll = useCallback(() => {
     setIsScrolled(window.scrollY > 10);
+    
+    // Determine which section is currently in view
+    const sections = ['home', 'skills', 'projects', 'experience', 'resume', 'goals', 'contact'];
+    const scrollPosition = window.scrollY + 100;
+    
+    for (const section of sections) {
+      const element = document.getElementById(section);
+      if (element) {
+        const offsetTop = element.offsetTop;
+        const offsetBottom = offsetTop + element.offsetHeight;
+        
+        if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+          setActiveSection(section);
+          break;
+        }
+      }
+    }
   }, []);
 
+  // Debounced resize handler
   const handleResize = useCallback(() => {
     setWindowWidth(window.innerWidth);
     if (window.innerWidth > 992) {
@@ -548,6 +669,7 @@ const ProfessionalWhiteNavbar = () => {
     }
   }, []);
 
+  // Click outside handler
   const handleClickOutside = useCallback((e) => {
     const languageButton = document.querySelector('.language-selector-button');
     const languageMenu = document.querySelector('.language-selector-menu');
@@ -566,6 +688,7 @@ const ProfessionalWhiteNavbar = () => {
     }
   }, [isMobileMenuOpen, isLanguageOpen]);
 
+  // Language selection handler
   const handleLanguageSelect = useCallback((selectedLanguage) => {
     changeLanguage(selectedLanguage);
     setIsLanguageOpen(false);
@@ -574,6 +697,7 @@ const ProfessionalWhiteNavbar = () => {
     }
   }, [isMobile, changeLanguage]);
 
+  // Navigation handler
   const handleNavigation = useCallback((e, target) => {
     e.preventDefault();
     
@@ -581,9 +705,13 @@ const ProfessionalWhiteNavbar = () => {
       setIsMobileMenuOpen(false);
     }
     
+    // Set active section based on target
+    const section = target.replace('#', '');
+    setActiveSection(section);
+    
     // Nëse nuk jemi në faqen kryesore, ridrejto në faqen kryesore me hash
     if (location.pathname !== '/') {
-      window.location.href = `/#${target}`;
+      window.location.href = `/${target}`;
       return;
     }
     
@@ -593,16 +721,18 @@ const ProfessionalWhiteNavbar = () => {
       element.scrollIntoView({ behavior: 'smooth' });
       
       // Ndrysho URL-në pa rifreskim faqe
-      window.history.pushState(null, null, `/#${target.replace('#', '')}`);
+      window.history.pushState(null, null, target);
     }
   }, [isMobileMenuOpen, location.pathname]);
 
+  // Initialize language if not set
   useEffect(() => {
     if (!languageCode) {
       changeLanguage('English');
     }
   }, [languageCode, changeLanguage]);
 
+  // Event listeners setup
   useEffect(() => {
     const debouncedScroll = debounce(handleScroll, 100);
     const debouncedResize = debounce(handleResize, 100);
@@ -611,6 +741,9 @@ const ProfessionalWhiteNavbar = () => {
     window.addEventListener('resize', debouncedResize);
     document.addEventListener('mousedown', handleClickOutside);
     
+    // Initial check for active section
+    handleScroll();
+    
     return () => {
       window.removeEventListener('scroll', debouncedScroll);
       window.removeEventListener('resize', debouncedResize);
@@ -618,10 +751,13 @@ const ProfessionalWhiteNavbar = () => {
     };
   }, [handleScroll, handleResize, handleClickOutside]);
 
-  // Kontrollo hash-in e URL kur komponenti ngarkohet
+  // Handle URL hash on component mount
   useEffect(() => {
     if (location.hash) {
-      const element = document.getElementById(location.hash.replace('#', ''));
+      const section = location.hash.replace('#', '');
+      setActiveSection(section);
+      
+      const element = document.getElementById(section);
       if (element) {
         setTimeout(() => {
           element.scrollIntoView({ behavior: 'smooth' });
@@ -632,22 +768,31 @@ const ProfessionalWhiteNavbar = () => {
 
   return (
     <>
-      <nav
+      <motion.nav
         className="position-fixed top-0 w-100"
+        initial={{ y: -100 }}
+        animate={{ y: 0 }}
+        transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
         style={{
-          padding: isMobile ? '1rem 1.5rem' : '1.5rem 3rem',
-          backgroundColor: isScrolled || isMobileMenuOpen ? colors.dark : 'rgba(255, 255, 255, 0.95)',
-          backdropFilter: isScrolled ? 'blur(12px)' : 'blur(8px)',
-          borderBottom: `1px solid ${colors.border}`,
-          transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+          padding: isMobile ? '1rem 1.2rem' : '1.2rem 2rem',
+          backgroundColor: isDarkMode 
+            ? (isScrolled ? colorScheme.background : colorScheme.backgroundSolid)
+            : (isScrolled ? colorScheme.background : 'transparent'),
+          backdropFilter: isScrolled ? 'blur(20px)' : (isDarkMode ? 'none' : 'none'),
+          borderBottom: isScrolled ? `1px solid ${colorScheme.border}` : (isDarkMode ? `1px solid ${colorScheme.border}20` : 'none'),
+          transition: 'all 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
           zIndex: 1050,
-          boxShadow: isScrolled ? '0 2px 10px rgba(0, 0, 0, 0.05)' : 'none'
+          boxShadow: isScrolled 
+            ? `0 4px 30px ${colorScheme.primary}05` 
+            : (isDarkMode ? `0 2px 10px rgba(0, 0, 0, 0.1)` : 'none')
         }}
       >
         <div className="container d-flex justify-content-between align-items-center">
+          {/* Logo */}
           <motion.div
             className="d-flex align-items-center"
-            whileHover={{ scale: 1.03 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             transition={{ type: 'spring', stiffness: 400 }}
           >
             <Link
@@ -657,148 +802,145 @@ const ProfessionalWhiteNavbar = () => {
                 fontFamily: "'Inter', sans-serif",
                 fontWeight: 700,
                 fontSize: '1.4rem',
-                color: colors.light,
-                gap: '0.5rem',
+                color: colorScheme.text,
+                gap: '0.4rem',
                 letterSpacing: '0.5px'
               }}
               aria-label="Home"
               onClick={(e) => {
                 if (location.pathname === '/') {
                   e.preventDefault();
+                  setActiveSection('home');
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }
               }}
             >
-              {isScrolled && <FaHome style={{ color: colors.primary }} />}
-              Elsa <span style={{ color: colors.primary }}>Imeri</span>
+              <motion.span
+                whileHover={{ scale: 1.1 }}
+                transition={{ type: 'spring', stiffness: 400 }}
+              >
+                <FaHome style={{ color: colorScheme.primary, fontSize: '1.2rem' }} />
+              </motion.span>
+              Elsa <span style={{ color: colorScheme.primary }}>Imeri</span>
             </Link>
           </motion.div>
 
+          {/* Desktop Navigation */}
           {!isMobile ? (
             <div className="d-flex align-items-center">
-              {!isScrolled ? (
-                <>
-                  <NavIconItem
-                    icon={<FaCode />}
-                    text={t.skills}
-                    link="#skills"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavIconItem
-                    icon={<FaProjectDiagram />}
-                    text={t.projects}
-                    link="#projects"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavIconItem
-                    icon={<FaRoute />}
-                    text={t.journey}
-                    link="#experience"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavIconItem
-                    icon={<FaBookOpen />}
-                    text={t.articles}
-                    link="#resume"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                </>
-              ) : (
-                <>
-                  <NavTextItem
-                    text={t.skills}
-                    link="#skills"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavTextItem
-                    text={t.projects}
-                    link="#projects"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavTextItem
-                    text={t.journey}
-                    link="#experience"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavTextItem
-                    text={t.contact}
-                    link="#contact"
-                    colors={colors}
-                    onClick={handleNavigation}
-                  />
-                  <NavTextItem
-                    text={t.goals}
-                    link="#goals"
-                    colors={colors}
-                    isActive={true}
-                    onClick={handleNavigation}
-                  />
-                </>
-              )}
+              <div className="d-flex align-items-center me-4">
+                <NavIconItem
+                  icon={<FaUser />}
+                  text={t.skills}
+                  link="#skills"
+                  onClick={handleNavigation}
+                  isActive={activeSection === 'skills'}
+                  colorScheme={colorScheme}
+                />
+                <NavIconItem
+                  icon={<FaBriefcase />}
+                  text={t.projects}
+                  link="#projects"
+                  onClick={handleNavigation}
+                  isActive={activeSection === 'projects'}
+                  colorScheme={colorScheme}
+                />
+                <NavIconItem
+                  icon={<FaHistory />}
+                  text={t.journey}
+                  link="#experience"
+                  onClick={handleNavigation}
+                  isActive={activeSection === 'experience'}
+                  colorScheme={colorScheme}
+                />
+                <NavIconItem
+                  icon={<FaFileAlt />}
+                  text={t.resume}
+                  link="#resume"
+                  onClick={handleNavigation}
+                  isActive={activeSection === 'resume'}
+                  colorScheme={colorScheme}
+                />
+                <NavIconItem
+                  icon={<FaBullseye />}
+                  text={t.goals}
+                  link="#goals"
+                  onClick={handleNavigation}
+                  isActive={activeSection === 'goals'}
+                  colorScheme={colorScheme}
+                />
+                <NavIconItem
+                  icon={<FaPaperPlane />}
+                  text={t.contact}
+                  link="#contact"
+                  onClick={handleNavigation}
+                  isActive={activeSection === 'contact'}
+                  colorScheme={colorScheme}
+                />
+              </div>
 
-              <div className="ms-4">
+              <div className="d-flex align-items-center gap-2">
+                <ThemeToggle 
+                  isDarkMode={isDarkMode} 
+                  toggleTheme={toggleTheme} 
+                  isMobile={false}
+                />
                 <LanguageSelector
                   isLanguageOpen={isLanguageOpen}
                   setIsLanguageOpen={setIsLanguageOpen}
                   selectedLanguage={language}
                   handleLanguageSelect={handleLanguageSelect}
-                  colors={colors}
-                  languages={languages}
+                  colorScheme={colorScheme}
                 />
               </div>
             </div>
           ) : (
-            <div className="d-flex align-items-center">
-              <div className="me-3">
-                <LanguageSelector
-                  isLanguageOpen={isLanguageOpen}
-                  setIsLanguageOpen={setIsLanguageOpen}
-                  selectedLanguage={language}
-                  handleLanguageSelect={handleLanguageSelect}
-                  colors={colors}
-                  languages={languages}
-                  isMobile={true}
-                />
-              </div>
+            /* Mobile Controls */
+            <div className="d-flex align-items-center gap-2">
+              <ThemeToggle 
+                isDarkMode={isDarkMode} 
+                toggleTheme={toggleTheme} 
+                isMobile={true}
+              />
               <MobileMenuToggle
                 isMobileMenuOpen={isMobileMenuOpen}
                 setIsMobileMenuOpen={setIsMobileMenuOpen}
-                colors={colors}
+                colorScheme={colorScheme}
               />
             </div>
           )}
         </div>
-      </nav>
+      </motion.nav>
 
+      {/* Mobile Menu */}
       <MobileMenu
         isMobile={isMobile}
         isMobileMenuOpen={isMobileMenuOpen}
         setIsMobileMenuOpen={setIsMobileMenuOpen}
         handleNavigation={handleNavigation}
-        colors={colors}
         translations={t}
-        languages={languages}
         selectedLanguage={language}
         handleLanguageSelect={handleLanguageSelect}
+        activeSection={activeSection}
+        isDarkMode={isDarkMode}
+        toggleTheme={toggleTheme}
+        colorScheme={colorScheme}
       />
     </>
   );
 };
 
+// Optimized debounce function
 function debounce(func, wait) {
   let timeout;
-  return function(...args) {
-    const context = this;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };     
     clearTimeout(timeout);
-    timeout = setTimeout(() => func.apply(context, args), wait);
+    timeout = setTimeout(later, wait);
   };
 }
 
-export default React.memo(ProfessionalWhiteNavbar);
+export default React.memo(ModernNavbar);

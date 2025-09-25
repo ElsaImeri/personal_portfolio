@@ -4,25 +4,66 @@ import { FaDownload, FaEye, FaFilePdf } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { LanguageContext } from '../../contexts/LanguageContext';
 import { translations } from '../../utils/translations';
+import ThemeContext from '../../contexts/ThemeContext';
+
+// Color schemes for light and dark modes
+const colorSchemes = {
+  dark: {
+    primary: '#6c63ff',
+    secondary: '#8a85ff',
+    text: '#ffffff',
+    mutedText: '#a8b3cc',
+    background: 'linear-gradient(135deg, #0f111a 0%, #1a1a2e 50%, #0f111a 100%)',
+    cardBackground: 'rgba(108, 99, 255, 0.1)',
+    cardBorder: '1px solid rgba(108, 99, 255, 0.2)',
+    buttonBackground: '#6c63ff',
+    buttonHover: '#5a52d6',
+    buttonText: '#ffffff',
+    outlineButtonBorder: '2px solid #6c63ff',
+    outlineButtonText: '#6c63ff',
+    outlineButtonHoverBackground: '#6c63ff',
+    outlineButtonHoverText: '#ffffff'
+  },
+  light: {
+    primary: '#6c63ff',
+    secondary: '#8a85ff',
+    text: '#333333',
+    mutedText: '#666666',
+    background: 'linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #ffffff 100%)',
+    cardBackground: 'rgba(108, 99, 255, 0.08)',
+    cardBorder: '1px solid rgba(108, 99, 255, 0.15)',
+    buttonBackground: '#6c63ff',
+    buttonHover: '#5a52d6',
+    buttonText: '#ffffff',
+    outlineButtonBorder: '2px solid #6c63ff',
+    outlineButtonText: '#6c63ff',
+    outlineButtonHoverBackground: '#6c63ff',
+    outlineButtonHoverText: '#ffffff'
+  }
+};
 
 const ResumeCard = React.memo(function ResumeCard({ 
   previewUrl, 
-  primaryColor, 
-  secondaryColor, 
+  colorScheme, 
   t 
 }) {
   return React.createElement(
     motion.div,
     {
       style: {
-        backgroundColor: 'rgba(108, 99, 255, 0.1)',
+        backgroundColor: colorScheme.cardBackground,
         borderRadius: '12px',
         padding: '1.5rem',
         maxWidth: '500px',
-        border: `1px solid ${primaryColor}20`,
-        cursor: 'pointer'
+        border: colorScheme.cardBorder,
+        cursor: 'pointer',
+        backdropFilter: 'blur(10px)',
+        transition: 'all 0.3s ease'
       },
-      whileHover: { y: -5 },
+      whileHover: { 
+        y: -5,
+        boxShadow: `0 10px 30px ${colorScheme.primary}20`
+      },
       onClick: function() { window.open(previewUrl, '_blank'); },
       'aria-label': t.viewResume || "View resume",
       role: "button",
@@ -35,7 +76,7 @@ const ResumeCard = React.memo(function ResumeCard({
       React.createElement(FaFilePdf, { 
         style: { 
           fontSize: '2.5rem', 
-          color: primaryColor 
+          color: colorScheme.primary 
         } 
       }),
       React.createElement(
@@ -45,10 +86,11 @@ const ResumeCard = React.memo(function ResumeCard({
           'h5',
           {
             style: {
-              color: '#333',
+              color: colorScheme.text,
               fontFamily: "'Inter', sans-serif",
               fontWeight: 600,
-              marginBottom: '0.25rem'
+              marginBottom: '0.25rem',
+              transition: 'color 0.3s ease'
             }
           },
           t.resumeTitle || "Elsa Imeri - Professional Resume"
@@ -57,10 +99,11 @@ const ResumeCard = React.memo(function ResumeCard({
           'p',
           {
             style: {
-              color: secondaryColor,
+              color: colorScheme.mutedText,
               fontFamily: "'Inter', sans-serif",
               fontSize: '0.9rem',
-              marginBottom: '0'
+              marginBottom: '0',
+              transition: 'color 0.3s ease'
             }
           },
           t.resumeSubtitle || "PDF Document",
@@ -76,15 +119,14 @@ const ResumeCard = React.memo(function ResumeCard({
 
 ResumeCard.propTypes = {
   previewUrl: PropTypes.string.isRequired,
-  primaryColor: PropTypes.string.isRequired,
-  secondaryColor: PropTypes.string.isRequired,
+  colorScheme: PropTypes.object.isRequired,
   t: PropTypes.object.isRequired
 };
 
 const ResumeButton = React.memo(function ResumeButton({ 
   type, 
   url, 
-  primaryColor, 
+  colorScheme, 
   t,
   download = false
 }) {
@@ -100,18 +142,19 @@ const ResumeButton = React.memo(function ResumeButton({
       download: download ? "Elsa_Imeri_Resume.pdf" : undefined,
       className: "btn btn-lg d-flex align-items-center gap-2",
       style: {
-        backgroundColor: isPreview ? 'transparent' : primaryColor,
-        color: isPreview ? primaryColor : '#fff',
-        border: isPreview ? `2px solid ${primaryColor}` : 'none',
+        backgroundColor: isPreview ? 'transparent' : colorScheme.buttonBackground,
+        color: isPreview ? colorScheme.outlineButtonText : colorScheme.buttonText,
+        border: isPreview ? colorScheme.outlineButtonBorder : 'none',
         borderRadius: '8px',
         padding: '0.75rem 1.5rem',
         fontFamily: "'Inter', sans-serif",
         fontWeight: 600,
-        textDecoration: 'none'
+        textDecoration: 'none',
+        transition: 'all 0.3s ease'
       },
       whileHover: {
-        backgroundColor: isPreview ? primaryColor : '#5a52d6',
-        color: isPreview ? '#fff' : undefined,
+        backgroundColor: isPreview ? colorScheme.outlineButtonHoverBackground : colorScheme.buttonHover,
+        color: isPreview ? colorScheme.outlineButtonHoverText : colorScheme.buttonText,
         scale: 1.05
       },
       whileTap: { scale: 0.95 },
@@ -126,15 +169,19 @@ const ResumeButton = React.memo(function ResumeButton({
 ResumeButton.propTypes = {
   type: PropTypes.oneOf(['preview', 'download']).isRequired,
   url: PropTypes.string.isRequired,
-  primaryColor: PropTypes.string.isRequired,
+  colorScheme: PropTypes.object.isRequired,
   t: PropTypes.object.isRequired,
   download: PropTypes.bool
 };
 
 function Resume() {
   const { languageCode } = useContext(LanguageContext);
-  const primaryColor = '#6c63ff';
-  const secondaryColor = '#6c757d';
+  const { isDarkMode } = useContext(ThemeContext);
+  
+  const colorScheme = useMemo(() => 
+    isDarkMode ? colorSchemes.dark : colorSchemes.light, 
+    [isDarkMode]
+  );
 
   const t = useMemo(function() {
     return {
@@ -152,10 +199,11 @@ function Resume() {
     {
       id: "resume",
       style: {
-        backgroundColor: '#fff',
+        background: colorScheme.background,
         padding: '5rem 0',
         position: 'relative',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        transition: 'all 0.3s ease'
       },
       'aria-label': t.resumeSection || "Resume section"
     },
@@ -168,8 +216,9 @@ function Resume() {
           left: 0,
           width: '100%',
           height: '100%',
-          background: 'radial-gradient(circle at 80% 30%, rgba(108, 99, 255, 0.05) 0%, transparent 50%)',
-          zIndex: 0
+          background: `radial-gradient(circle at 80% 30%, ${colorScheme.primary}${isDarkMode ? '0.05' : '0.03'} 0%, transparent 50%)`,
+          zIndex: 0,
+          transition: 'background 0.3s ease'
         }
       }
     ),
@@ -189,18 +238,19 @@ function Resume() {
           'h2',
           {
             style: {
-              color: '#333',
+              color: colorScheme.text,
               fontFamily: "'Inter', sans-serif",
               fontWeight: 700,
               marginBottom: '1rem',
-              fontSize: '2rem'
+              fontSize: '2rem',
+              transition: 'color 0.3s ease'
             }
           },
           t.my || "My",
           " ",
           React.createElement(
             'span',
-            { style: { color: primaryColor } },
+            { style: { color: colorScheme.primary } },
             t.resume || "Resume"
           )
         ),
@@ -208,12 +258,13 @@ function Resume() {
           'p',
           {
             style: {
-              color: secondaryColor,
+              color: colorScheme.mutedText,
               fontFamily: "'Inter', sans-serif",
               fontSize: '1rem',
               lineHeight: 1.7,
               maxWidth: '600px',
-              margin: '0 auto 2rem'
+              margin: '0 auto 2rem',
+              transition: 'color 0.3s ease'
             }
           },
           t.resumeDescription || "Download or view my resume to see my experience and skills in detail."
@@ -224,13 +275,13 @@ function Resume() {
           React.createElement(ResumeButton, {
             type: "preview",
             url: previewUrl,
-            primaryColor: primaryColor,
+            colorScheme: colorScheme,
             t: t
           }),
           React.createElement(ResumeButton, {
             type: "download",
             url: downloadUrl,
-            primaryColor: primaryColor,
+            colorScheme: colorScheme,
             t: t,
             download: true
           })
@@ -240,8 +291,7 @@ function Resume() {
           { className: "mt-5 d-flex justify-content-center" },
           React.createElement(ResumeCard, {
             previewUrl: previewUrl,
-            primaryColor: primaryColor,
-            secondaryColor: secondaryColor,
+            colorScheme: colorScheme,
             t: t
           })
         )
